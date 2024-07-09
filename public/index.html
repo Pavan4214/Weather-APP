@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #87CEFA;
+            margin: 0;
+        }
+        .weather-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .weather-box h1, .weather-box p {
+            margin: 10px 0;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: calc(100% - 22px);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #weatherResult, #error {
+            display: none;
+            margin-top: 20px;
+        }
+        #weatherResult h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        #weatherResult p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        #error p {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-box">
+        <form id="cityForm">
+            <div class="form-group">
+                <label for="city">Enter city name:</label>
+                <input type="text" id="city" name="city" required>
+            </div>
+            <button type="submit">Get Weather</button>
+        </form>
+        <div id="weatherResult">
+            <h1>Weather in <span id="location"></span></h1>
+            <p>Temperature: <span id="tempval"></span>°C</p>
+            <p>Min Temperature: <span id="tempmin"></span>°C</p>
+            <p>Max Temperature: <span id="tempmax"></span>°C</p>
+            <p>Weather Status: <span id="tempstatus"></span></p>
+        </div>
+        <div id="error">
+            <p>City not found. Please try again.</p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('cityForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const city = document.getElementById('city').value;
+            fetch(`/weather?city=${city}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cod !== 200) {
+                        document.getElementById('error').style.display = 'block';
+                        document.getElementById('weatherResult').style.display = 'none';
+                    } else {
+                        document.getElementById('error').style.display = 'none';
+                        document.getElementById('weatherResult').style.display = 'block';
+                        document.getElementById('location').innerText = `${data.name}, ${data.sys.country}`;
+                        document.getElementById('tempval').innerText = data.main.temp;
+                        document.getElementById('tempmin').innerText = data.main.temp_min;
+                        document.getElementById('tempmax').innerText = data.main.temp_max;
+                        document.getElementById('tempstatus').innerText = data.weather[0].main;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('weatherResult').style.display = 'none';
+                });
+        });
+    </script>
+</body>
+</html>
